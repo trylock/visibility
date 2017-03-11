@@ -1,4 +1,6 @@
 # Visibility Polygon
+[![Build Status](https://travis-ci.org/trylock/visibility.svg?branch=master)](https://travis-ci.org/trylock/visibility)
+
 Simple [Visibility polygon](https://en.wikipedia.org/wiki/Visibility_polygon) algorithm implementation. This was my semestral work for lecture ADS2 at MFF UK.
 
 The project is separated into 2 subprojects: *visibility* (header-only library) and *tests*.
@@ -13,7 +15,7 @@ All functions and classes are in the `geometry` namespace.
 
 ### Vector
 
-The program implements a fixed sized vector template in the `Vector.hpp` header. You can use mutable operators `+`, `-`, `*`, `/` as well as their immutable variants. Apart from that you can use global functions `dot(a, b)` (calculates a dot product of 2 vectors), `length_squared(vector)`, `distance_squared(a, b)`, `normal(a)` (calculates a 2D orthogonal vector), `cross(a, b)` (determinat of the `[[a_x, b_x], [a_y, b_y]]` matrix). Floating point vectors can be normalized to have an unit length using the `normalize(vector)` function (returns 0 vector in case of a 0 vector). 
+The program implements a fixed sized vector template in the `Vector.hpp` header. You can use immutable operators `+`, `-`, `*`, `/` as well as their mutable variants. Apart from that you can use global functions `dot(a, b)` (calculates a dot product of 2 vectors), `length_squared(vector)`, `distance_squared(a, b)`, `normal(a)` (calculates a 2D orthogonal vector), `cross(a, b)` (determinat of the `[[a_x, b_x], [a_y, b_y]]` matrix). Floating point vectors can be normalized to have an unit length using the `normalize(vector)` function (returns 0 vector in case of a 0 vector). 
 
 ### Primitives
 
