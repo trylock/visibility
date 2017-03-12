@@ -1,7 +1,7 @@
 # Visibility Polygon
 [![Build Status](https://travis-ci.org/trylock/visibility.svg?branch=master)](https://travis-ci.org/trylock/visibility)
 
-Simple [Visibility polygon](https://en.wikipedia.org/wiki/Visibility_polygon) algorithm implementation. This was my semestral work for lecture ADS2 at MFF UK.
+Simple [Visibility polygon](https://en.wikipedia.org/wiki/Visibility_polygon) algorithm implementation. My inspiration for this project was [2d Visibility](http://www.redblobgames.com/articles/visibility/) article on the Red Blob Games website. This was my semestral work for lecture ADS2 at MFF UK.
 
 The project is separated into 2 subprojects: *visibility* (header-only library) and *tests*.
 
