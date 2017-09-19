@@ -8,9 +8,9 @@
 #include <cmath>
 #include <cassert>
 
-#include "Floats.hpp"
-#include "Vector.hpp"
-#include "Primitives.hpp"
+#include "floats.hpp"
+#include "vector2.hpp"
+#include "primitives.hpp"
 
 namespace geometry
 {
@@ -19,62 +19,69 @@ namespace geometry
                 (2) the line segments do not intersect except at their endpoints
                 (3) no line segment is collinear with the origin
     */
-    struct LineSegmentDistComparator
+    struct line_segment_dist_comparer
     {
         vec2 origin;
 
-        LineSegmentDistComparator(vec2 origin) : origin(origin) {}
+        explicit line_segment_dist_comparer(vec2 origin) : origin(origin) {}
 
-        bool operator()(const LineSegment& x, const LineSegment& y) const
+        bool operator()(const line_segment& x, const line_segment& y) const
         {
             auto a = x.a, b = x.b;
             auto c = y.a, d = y.b;
 
-            assert(orientation(origin, a, b) != Orientation::Collinear && "AB must not be collinear with the origin.");
-            assert(orientation(origin, c, d) != Orientation::Collinear && "CD must not be collinear with the origin.");
+            assert(
+                compute_orientation(origin, a, b) != orientation::collinear && 
+                "AB must not be collinear with the origin.");
+            assert(
+                compute_orientation(origin, c, d) != orientation::collinear &&
+                "CD must not be collinear with the origin.");
 
             // sort the endpoints so that if there are common endpoints, it will be a and c 
-            if (approx_equal(b, c) || approx_equal(b, d)) std::swap(a, b);
+            if (approx_equal(b, c) || approx_equal(b, d)) 
+                std::swap(a, b);
             if (approx_equal(a, d)) std::swap(c, d);
 
             // cases with common endpoints
             if (approx_equal(a, c))
             {
-                if (approx_equal(b, d) || orientation(origin, a, d) != orientation(origin, a, b)) return false;
-                return orientation(a, b, d) != orientation(a, b, origin);
+                if (approx_equal(b, d) || compute_orientation(origin, a, d) != compute_orientation(origin, a, b)) 
+                    return false;
+                return compute_orientation(a, b, d) != compute_orientation(a, b, origin);
             }
 
             // cases without common endpoints
-            auto cda = orientation(c, d, a);
-            auto cdb = orientation(c, d, b);
-            if (cdb == Orientation::Collinear && cda == Orientation::Collinear)
+            auto cda = compute_orientation(c, d, a);
+            auto cdb = compute_orientation(c, d, b);
+            if (cdb == orientation::collinear && cda == orientation::collinear)
             {
                 return distance_squared(origin, a) < distance_squared(origin, c);
             }
-            else if (cda == cdb || cda == Orientation::Collinear || cdb == Orientation::Collinear)
+            else if (cda == cdb || cda == orientation::collinear || cdb == orientation::collinear)
             {
-                auto cdo = orientation(c, d, origin);
+                auto cdo = compute_orientation(c, d, origin);
                 return cdo == cda || cdo == cdb;
             }
             else
             {
-                return orientation(a, b, origin) != orientation(a, b, c);
+                return compute_orientation(a, b, origin) != compute_orientation(a, b, c);
             }
         }
     };
 
     // compare angles clockwise starting at the positive y axis
-    struct AngleComparator
+    struct angle_comparer
     {
         vec2 vertex;
 
-        AngleComparator(vec2 origin) : vertex(origin) {}
+        explicit angle_comparer(vec2 origin) : vertex(origin) {}
 
         bool operator()(const vec2& a, const vec2& b) const
         {
             auto is_a_left = strictly_less(a[0], vertex[0]);
             auto is_b_left = strictly_less(b[0], vertex[0]);
-            if (is_a_left != is_b_left) return is_b_left;
+            if (is_a_left != is_b_left) 
+                return is_b_left;
 
             if (approx_equal(a[0], vertex[0]) && approx_equal(b[0], vertex[0]))
             {
@@ -96,20 +103,20 @@ namespace geometry
         }
     };
 
-    // events used in the visibility polygon algorithm
-    enum class VisibilityEventType
+    struct visibility_event
     {
-        StartVertex,
-        EndVertex
-    };
+        // events used in the visibility polygon algorithm
+        enum event_type
+        {
+            start_vertex,
+            end_vertex
+        };
 
-    struct VisibilityEvent
-    {
-        VisibilityEventType type;
-        LineSegment segment;
+        event_type type;
+        line_segment segment;
 
-        VisibilityEvent() {}
-        VisibilityEvent(VisibilityEventType type, const LineSegment& segment) : type(type), segment(segment) {}
+        visibility_event() {}
+        visibility_event(event_type type, const line_segment& segment) : type(type), segment(segment) {}
 
         inline const vec2& point() const { return segment.a; }
     };
@@ -119,56 +126,60 @@ namespace geometry
         \param list of arbitrary ordered line segments (line segments collinear with the point are ignored)
         \return vector of vertices of the visibility polygon
      */
-    std::vector<vec2> VisibilityPolygon(vec2 point, const std::vector<LineSegment>& segments)
+    std::vector<vec2> visibility_polygon(vec2 point, const std::vector<line_segment>& segments)
     {
-        LineSegmentDistComparator cmp_dist{ point };
-        std::set<LineSegment, LineSegmentDistComparator> state{ cmp_dist };
-        std::vector<VisibilityEvent> events;
+        line_segment_dist_comparer cmp_dist{ point };
+        std::set<line_segment, line_segment_dist_comparer> state{ cmp_dist };
+        std::vector<visibility_event> events;
         events.reserve(segments.size() * 2 + 1);
 
         for (auto&& segment : segments)
         {
             // Sort line segment endpoints and add them as events
             // Skip line segments collinear with the point
-            if (orientation(point, segment.a, segment.b) == Orientation::Collinear)
+            if (compute_orientation(point, segment.a, segment.b) == orientation::collinear)
             {
                 continue;
             }
-            else if (orientation(point, segment.a, segment.b) == Orientation::RightTrun)
+            else if (compute_orientation(point, segment.a, segment.b) == orientation::right_turn)
             {
-                events.emplace_back(VisibilityEventType::StartVertex, segment);
-                events.emplace_back(VisibilityEventType::EndVertex, LineSegment{ segment.b, segment.a });
+                events.emplace_back(visibility_event::start_vertex, segment);
+                events.emplace_back(visibility_event::end_vertex, line_segment{ segment.b, segment.a });
             }
             else
             {
-                events.emplace_back(VisibilityEventType::StartVertex, LineSegment{ segment.b, segment.a });
-                events.emplace_back(VisibilityEventType::EndVertex, segment);
+                events.emplace_back(visibility_event::start_vertex, line_segment{ segment.b, segment.a });
+                events.emplace_back(visibility_event::end_vertex, segment);
             }
 
             // Initialize state by adding line segments that are intersected by vertical ray from the point
             auto a = segment.a, b = segment.b;
-            if (a[0] > b[0]) std::swap(a, b);
+            if (a[0] > b[0]) 
+                std::swap(a, b);
 
-            auto abp = orientation(a, b, point);
-            if ((approx_equal(b[0], point[0]) || (a[0] < point[0] && point[0] < b[0])) && abp == Orientation::RightTrun)
+            auto abp = compute_orientation(a, b, point);
+            if ((approx_equal(b[0], point[0]) || (a[0] < point[0] && point[0] < b[0])) && abp == orientation::right_turn)
             {
                 state.insert(segment);
             }
         }
 
         // sort events by angle
-        AngleComparator cmp_angle{ point };
-        std::sort(events.begin(), events.end(), [&cmp_angle](const VisibilityEvent& a, const VisibilityEvent& b) {
-            return approx_equal(a.point(), b.point()) ?
-                a.type == VisibilityEventType::EndVertex && b.type == VisibilityEventType::StartVertex : // if the points are equal, sort end vertices first
-                cmp_angle(a.point(), b.point());
+        angle_comparer cmp_angle{ point };
+        std::sort(events.begin(), events.end(), [&cmp_angle](auto&& a, auto&& b) 
+        {
+            // if the points are equal, sort end vertices first
+            if (approx_equal(a.point(), b.point()))
+                return a.type == visibility_event::end_vertex && b.type == visibility_event::start_vertex;
+            return cmp_angle(a.point(), b.point());
         });
 
         // find the visibility polygon
         std::vector<vec2> vertices;
         for (auto&& event : events)
         {
-            if (event.type == VisibilityEventType::EndVertex) state.erase(event.segment);
+            if (event.type == visibility_event::end_vertex) 
+                state.erase(event.segment);
 
             if (state.empty())
             {
@@ -177,10 +188,10 @@ namespace geometry
             else if (cmp_dist(event.segment, *state.begin()))
             {
                 vec2 intersection;
-                auto result = Ray{ point, event.point() - point }.Intersects(*state.begin(), intersection);
+                auto result = ray{ point, event.point() - point }.intersects(*state.begin(), intersection);
                 assert(result && "Ray intersects a line segment iff the line segment is in the state");
 
-                if (event.type == VisibilityEventType::StartVertex)
+                if (event.type == visibility_event::start_vertex)
                 {
                     vertices.push_back(intersection);
                     vertices.push_back(event.point());
@@ -192,7 +203,8 @@ namespace geometry
                 }
             }
 
-            if (event.type == VisibilityEventType::StartVertex) state.insert(event.segment);
+            if (event.type == visibility_event::start_vertex) 
+                state.insert(event.segment);
         }
 
         // remove collinear points
@@ -201,7 +213,8 @@ namespace geometry
         {
             auto prev = top == vertices.begin() ? vertices.end() - 1 : top - 1;
             auto next = it + 1 == vertices.end() ? vertices.begin() : it + 1;
-            if (orientation(*prev, *it, *next) != Orientation::Collinear) *top++ = *it;
+            if (compute_orientation(*prev, *it, *next) != orientation::collinear) 
+                *top++ = *it;
         }
         vertices.erase(top, vertices.end());
         return vertices;

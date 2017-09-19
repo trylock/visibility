@@ -4,7 +4,7 @@
 #include <limits>
 #include <algorithm>
 
-#include "Vector.hpp"
+#include "vector2.hpp"
 
 namespace geometry
 { 
@@ -18,32 +18,17 @@ namespace geometry
         return (b - a) > std::max(std::abs(a), std::abs(b)) * epsilon;
     }
 
-    template<typename T, std::size_t num_components>
-    bool approx_equal(
-        const Vector<T, num_components>& a, 
-        const Vector<T, num_components>& b, 
-        T epsilon = std::numeric_limits<T>::epsilon())
+    template<typename T>
+    bool approx_equal(vector2<T> a, vector2<T> b, T epsilon = std::numeric_limits<T>::epsilon())
     {
-        for (std::size_t i = 0; i < num_components; i++)
-        {
-            if (!approx_equal(a[i], b[i], epsilon)) return false;
-        }
-        return true;
+        return approx_equal(a.x, b.x, epsilon) && approx_equal(a.y, b.y, epsilon);
     }
 
-    template<typename T, std::size_t num_components>
-    bool strictly_less(
-        const Vector<T, num_components>& a,
-        const Vector<T, num_components>& b,
-        T epsilon = std::numeric_limits<T>::epsilon())
+    template<typename T>
+    bool strictly_less(vector2<T>& a, vector2<T> b, T epsilon = std::numeric_limits<T>::epsilon())
     {
-        for (std::size_t i = 0; i < num_components; i++)
-        {
-            if (!strictly_less(a[i], b[i], epsilon)) return false;
-        }
-        return true;
+        return strictly_less(a.x, b.x, epsilon) && strictly_less(a.y, b.y, epsilon);
     }
-
 }
 
 #endif // GEOMETRY_FLOATS_HPP_

@@ -1,5 +1,6 @@
 #include "catch.hpp"
-#include <visibility/Vector.hpp>
+
+#include <visibility/vector2.hpp>
 
 TEST_CASE("Create vector", "[vector]")
 {
