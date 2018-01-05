@@ -16,10 +16,14 @@ set(all_tests
     ${PROJECT_SOURCE_DIR}/tests/visibility_test.cpp
 )
 
+include_directories(${PROJECT_SOURCE_DIR})
+
 if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
     set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14 -Wall -Werror -Wextra")
 endif()
 
-include_directories(${PROJECT_SOURCE_DIR})
+# Create project in MSVC
+add_library(visibility STATIC ${visibility_headers})
+set_target_properties(visibility PROPERTIES LINKER_LANGUAGE CXX) 
 
 add_executable(tests ${all_tests})
