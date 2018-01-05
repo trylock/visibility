@@ -170,15 +170,15 @@ namespace geometry
         for (; begin != end; ++begin)
         {
             auto segment = *begin;
-            auto orientation = compute_orientation(point, segment.a, segment.b);
 
             // Sort line segment endpoints and add them as events
             // Skip line segments collinear with the point
-            if (orientation == orientation::collinear)
+            auto pab = compute_orientation(point, segment.a, segment.b);
+            if (pab == orientation::collinear)
             {
                 continue;
             }
-            else if (orientation == orientation::right_turn)
+            else if (pab == orientation::right_turn)
             {
                 events.emplace_back(event_type::start_vertex, segment);
                 events.emplace_back(
