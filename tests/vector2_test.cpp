@@ -7,12 +7,12 @@ TEST_CASE("Create vector", "[vector]")
     using namespace geometry;
 
     vec2 result(1);
-    REQUIRE(result[0] == 1);
-    REQUIRE(result[1] == 1);
+    REQUIRE(result.x == 1);
+    REQUIRE(result.y == 1);
 
     result = vec2{ 3, 4 };
-    REQUIRE(result[0] == 3);
-    REQUIRE(result[1] == 4);
+    REQUIRE(result.x == 3);
+    REQUIRE(result.y == 4);
 }
 
 TEST_CASE("Add vectors", "[vector]")
@@ -20,12 +20,12 @@ TEST_CASE("Add vectors", "[vector]")
     using namespace geometry;
 
     vec2 a{ 1, 2 }, b{ 3, 4 };
-    REQUIRE((a + b).element(0) == 4);
-    REQUIRE((a + b).element(1) == 6);
+    REQUIRE((a + b).x == 4);
+    REQUIRE((a + b).y == 6);
 
     a += b;
-    REQUIRE(a[0] == 4);
-    REQUIRE(a[1] == 6);
+    REQUIRE(a.x == 4);
+    REQUIRE(a.y == 6);
 }
 
 TEST_CASE("Subtract vectors", "[vector]")
@@ -33,12 +33,12 @@ TEST_CASE("Subtract vectors", "[vector]")
     using namespace geometry;
 
     vec2 a{ 1, 2 }, b{ 3, 4 };
-    REQUIRE((a - b).element(0) == -2);
-    REQUIRE((a - b).element(1) == -2);
+    REQUIRE((a - b).x == -2);
+    REQUIRE((a - b).y == -2);
 
     a -= b;
-    REQUIRE(a[0] == -2);
-    REQUIRE(a[1] == -2);
+    REQUIRE(a.x == -2);
+    REQUIRE(a.y == -2);
 }
 
 TEST_CASE("Multiply vector", "[vector]")
@@ -46,12 +46,12 @@ TEST_CASE("Multiply vector", "[vector]")
     using namespace geometry;
 
     vec2 a{ 1, 2 };
-    REQUIRE((a * 3 ).element(0) == 3);
-    REQUIRE((a * 3 ).element(1) == 6);
+    REQUIRE((a * 3 ).x == 3);
+    REQUIRE((a * 3 ).y == 6);
 
     a *= 3;
-    REQUIRE(a[0] == 3);
-    REQUIRE(a[1] == 6);
+    REQUIRE(a.x == 3);
+    REQUIRE(a.y == 6);
 }
 
 TEST_CASE("Divide vector", "[vector]")
@@ -59,12 +59,12 @@ TEST_CASE("Divide vector", "[vector]")
     using namespace geometry;
 
     vec2 a{ 2, 8 };
-    REQUIRE((a / 2).element(0) == 1);
-    REQUIRE((a / 2).element(1) == 4);
+    REQUIRE((a / 2).x == 1);
+    REQUIRE((a / 2).y == 4);
 
     a /= 2;
-    REQUIRE(a[0] == 1);
-    REQUIRE(a[1] == 4);
+    REQUIRE(a.x == 1);
+    REQUIRE(a.y == 4);
 }
 
 TEST_CASE("Negate vector", "[vector]")
@@ -72,8 +72,8 @@ TEST_CASE("Negate vector", "[vector]")
     using namespace geometry;
 
     vec2 a{ 2, 8 };
-    REQUIRE((-a).element(0) == -2);
-    REQUIRE((-a).element(1) == -8);
+    REQUIRE((-a).x == -2);
+    REQUIRE((-a).y == -8);
 }
 
 TEST_CASE("Compare 2 vectors", "[vector]")
@@ -84,7 +84,7 @@ TEST_CASE("Compare 2 vectors", "[vector]")
     REQUIRE(a == b);
     REQUIRE_FALSE(a != b);
 
-    b[0] = 0;
+    b.x = 0;
     REQUIRE_FALSE(a == b);
     REQUIRE(a != b);
 }
@@ -119,8 +119,8 @@ TEST_CASE("Calculate a 2D normal vector", "[vector]")
 
     vec2 a{ 3, 4 };
     auto perp = normal(a);
-    REQUIRE(perp[0] == -4);
-    REQUIRE(perp[1] == 3);
+    REQUIRE(perp.x == -4);
+    REQUIRE(perp.y == 3);
 }
 
 TEST_CASE("Calculate a determinant", "[vector]")
@@ -142,6 +142,6 @@ TEST_CASE("Normalize a floating point vector", "[vector]")
 
     vec2 zero{ 0, 0 };
     normalized = normalize(zero);
-    REQUIRE(normalized[0] == 0);
-    REQUIRE(normalized[1] == 0);
+    REQUIRE(normalized.x == 0);
+    REQUIRE(normalized.y == 0);
 }

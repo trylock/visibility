@@ -16,11 +16,7 @@ namespace geometry
     template<typename T>
     struct vector2
     {
-        union 
-        {
-            struct { T x, y; };
-            std::array<T, 2> components;
-        };
+        struct { T x, y; };
 
         vector2() {}
         vector2(T x, T y) : x(x), y(y) {}
@@ -29,13 +25,6 @@ namespace geometry
         // allow copy
         vector2(const vector2<T>&) = default;
         vector2& operator=(const vector2<T>&) = default;
-
-        // Array like element access
-        T& element(std::size_t index) { return components[index]; }
-        const T& element(std::size_t index) const { return components[index]; }
-
-        T& operator[](std::size_t index) { return element(index); }
-        const T& operator[](std::size_t index) const { return element(index); }
 
         // Mutable operations
         template<typename VectorType>
@@ -157,53 +146,83 @@ namespace geometry
         }
     };
 
-    // Calculate standard dot product
-    template<typename T>
-    T dot(vector2<T> a, vector2<T> b)
+    /** Calculate standard dot product.
+     * @param a vector
+     * @param b vector
+     * @return dot product of the 2 vectors
+     */
+    template<typename Vector>
+    auto dot(Vector a, Vector b)
     {
         return a.x * b.x + a.y * b.y;
     }
 
-    // Calculate squared length of a vector
-    template<typename T>
-    T length_squared(vector2<T> vector) 
+    /** Calculate squared length of a vector.
+     * @param vector
+     * @return squared length of the vector
+     */
+    template<typename Vector>
+    auto length_squared(Vector vector)
     { 
         return dot(vector, vector); 
     }
 
-    // Squared distance of 2 points 
-    template<typename T>
-    T distance_squared(vector2<T> a, vector2<T> b) 
+    /** Squared distance of 2 points.
+     * @param a point
+     * @param b point
+     * @return squared distance of the 2 points
+     */
+    template<typename Vector>
+    auto distance_squared(Vector a, Vector b)
     { 
         return length_squared(a - b); 
     }
 
-    // return perpendicular 2D vector 
-    template<typename T>
-    vector2<T> normal(vector2<T> vector) 
+    /** Return orthogonal 2D vector.
+     * @param vector
+     * @return vector orthogonal to the argument
+     */
+    template<typename Vector>
+    Vector normal(Vector vector)
     { 
         return{ -vector.y, vector.x }; 
     }
 
-    // calculate det([a_x, b.x; a_y, b_y])
-    template<typename T>
-    T cross(vector2<T> a, vector2<T> b) 
+    /** Calculate det([a_x, b.x; a_y, b_y]).
+     * @param a vector
+     * @param b vector
+     * @return det([a_x, b.x; a_y, b_y])
+     */
+    template<typename Vector>
+    auto cross(Vector a, Vector b)
     { 
         return a.x * b.y - a.y * b.x; 
     }
 
-    // normalize a floating point vector (return the argument if its close to zero)
-    template<typename T>
-    vector2<T> normalize(vector2<T> vector)
+    /** Normalize a floating point vector to have an unit length.
+     * @param vector to normalize
+     * @return normalized vector.
+     *         If the vector is 0, it will return a 0 vector.
+     *         If the vector is non-zero, it will return a vector with the same 
+     *         direction and unit length.
+     */
+    template<typename Vector>
+    Vector normalize(Vector vector)
     {
-        T length = std::sqrt(dot(vector, vector));
-        if (std::abs(length) < std::numeric_limits<T>::epsilon()) 
+        using value_type = typename std::decay<decltype(vector.x)>::type;
+
+        value_type length = std::sqrt(dot(vector, vector));
+        if (std::abs(length) < std::numeric_limits<value_type>::epsilon())
             return vector;
         vector /= length;
         return vector;
     }
 
-    // print a vector to the output stream
+    /** Print a vector to the output stream.
+     * @param output stream
+     * @param vector to print
+     * @return reference to given output stream
+     */
     template<typename T>
     std::ostream& operator<<(std::ostream& output, vector2<T> vector)
     {
