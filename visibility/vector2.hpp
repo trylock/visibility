@@ -16,6 +16,14 @@ namespace geometry
     template<typename T>
     struct vector2
     {
+        template<typename VectorType, typename ReturnType>
+        using if_vector = typename std::enable_if<
+            !std::is_scalar<VectorType>::value, ReturnType>::type;
+
+        template<typename ScalarType, typename ReturnType>
+        using if_scalar = typename std::enable_if<
+            std::is_scalar<ScalarType>::value, ReturnType>::type;
+
         struct { T x, y; };
 
         vector2() {}
@@ -28,7 +36,7 @@ namespace geometry
 
         // Mutable operations
         template<typename VectorType>
-        vector2<T>& operator+=(VectorType&& other)
+        vector2& operator+=(VectorType other)
         {
             x += other.x;
             y += other.y;
@@ -36,7 +44,7 @@ namespace geometry
         }
 
         template<typename VectorType>
-        vector2<T>& operator-=(VectorType&& other)
+        vector2& operator-=(VectorType other)
         {
             x -= other.x;
             y -= other.y;
@@ -44,8 +52,7 @@ namespace geometry
         }
         
         template<typename VectorType>
-        auto operator*=(VectorType&& other) 
-            -> typename std::enable_if<!std::is_scalar<typename std::decay<decltype(other)>::type>::value, vector2<T>&>::type
+        if_vector<VectorType, vector2&> operator*=(VectorType other)
         {
             x *= other.x;
             y *= other.y;
@@ -53,8 +60,7 @@ namespace geometry
         }
         
         template<typename VectorType>
-        auto operator/=(VectorType&& other) 
-            -> typename std::enable_if<!std::is_scalar<typename std::decay<decltype(other)>::type>::value, vector2<T>&>::type
+        if_vector<VectorType, vector2&> operator/=(VectorType other)
         {
             x /= other.x;
             y /= other.y;
@@ -62,8 +68,7 @@ namespace geometry
         }
         
         template<typename ScalarType>
-        auto operator*=(ScalarType&& scalar) 
-            -> typename std::enable_if<std::is_scalar<typename std::decay<decltype(scalar)>::type>::value, vector2<T>&>::type
+        if_scalar<ScalarType, vector2&> operator*=(ScalarType scalar)
         {
             x *= scalar;
             y *= scalar;
@@ -71,8 +76,7 @@ namespace geometry
         }
         
         template<typename ScalarType>
-        auto operator/=(ScalarType&& scalar) 
-            -> typename std::enable_if<std::is_scalar<typename std::decay<decltype(scalar)>::type>::value, vector2<T>&>::type
+        if_scalar<ScalarType, vector2&> operator/=(ScalarType scalar)
         {
             x /= scalar;
             y /= scalar;
@@ -81,48 +85,45 @@ namespace geometry
 
         // immutable operations
         template<typename VectorType>
-        vector2<T> operator+(VectorType&& other) const 
+        vector2 operator+(VectorType other) const 
         {
             return { x + other.x, y + other.y };
         }
         
         template<typename VectorType>
-        vector2<T> operator-(VectorType&& other) const 
+        vector2 operator-(VectorType other) const 
         {
             return { x - other.x, y - other.y };
         }
         
         template<typename VectorType>
-        auto operator*(VectorType&& other) const 
-            -> typename std::enable_if<!std::is_scalar<typename std::decay<decltype(other)>::type>::value, vector2<T>>::type
+        if_vector<VectorType, vector2> operator*(VectorType other) const 
         {
             return { x * other.x, y * other.y };
         }
         
         template<typename VectorType>
-        auto operator/(VectorType&& other) const 
-            -> typename std::enable_if<!std::is_scalar<typename std::decay<decltype(other)>::type>::value, vector2<T>>::type
+        if_vector<VectorType, vector2> operator/(VectorType other) const
         {
             return { x / other.x, y / other.y };
         }
         
         template<typename ScalarType>
-        auto operator*(ScalarType&& scalar) const 
-            -> typename std::enable_if<std::is_scalar<typename std::decay<decltype(scalar)>::type>::value, vector2<T>>::type
+        if_scalar<ScalarType, vector2> operator*(ScalarType scalar) const
         {
             return { x * scalar, y * scalar };
         }
         
         template<typename ScalarType>
-        friend auto operator*(ScalarType&& scalar, vector2<T> vector) 
-            -> typename std::enable_if<std::is_scalar<typename std::decay<decltype(scalar)>::type>::value, vector2<T>>::type
+        friend if_scalar<ScalarType, vector2> operator*(
+            ScalarType scalar, 
+            vector2 vector)
         {
             return { vector.x * scalar, vector.y * scalar };
         }
         
         template<typename ScalarType>
-        auto operator/(ScalarType&& scalar) const 
-            -> typename std::enable_if<std::is_scalar<typename std::decay<decltype(scalar)>::type>::value, vector2<T>>::type
+        if_scalar<ScalarType, vector2> operator/(ScalarType scalar) const
         {
             return { x / scalar, y / scalar };
         }
@@ -134,13 +135,13 @@ namespace geometry
 
         // comparison operators
         template<typename VectorType>
-        bool operator==(VectorType&& other) const 
+        bool operator==(VectorType other) const 
         {
             return x == other.x && y == other.y;
         }
 
         template<typename VectorType>
-        bool operator!=(VectorType&& other) const 
+        bool operator!=(VectorType other) const 
         {
             return x != other.x || y != other.y;
         }
