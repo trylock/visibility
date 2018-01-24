@@ -235,8 +235,9 @@ namespace geometry
                 // Nearest line segment has changed
                 // Compute the intersection point with this segment
                 vec2 intersection;
-                auto intersects = ray<Vector>{ point, event.point() - point }
-                    .intersects(*state.begin(), intersection);
+                ray<Vector> ray{ point, event.point() - point };
+                auto nearest_segment = *state.begin();
+                auto intersects = ray.intersects(nearest_segment, intersection);
                 assert(intersects && 
                     "Ray intersects line segment L iff L is in the state");
 
