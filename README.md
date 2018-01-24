@@ -20,7 +20,13 @@ All functions and classes are in the `geometry` namespace.
 
 ### Visibility Polygon
 
-Main function of the library is the `visibility_polygon` function. It takes the observer's position and begin and end iterator of the line segment list (obstacle list) as its arguments. It computes vertices of a visibility polygon in CW order and returns them. The line segments must not intersect except at their endpoints and the visiblity polygon has to be closed in order for it to produce a correct result (you can, for example, add edges of a bounding rectangle to ensure that the visibility polygon will always be closed). Notice that a closed visibility polygon will always be star-shaped (by definition) so its triangulation is trivial.
+Main function of the library is the `visibility_polygon` function. It takes observer's position and begin and end iterator of the line segment list (obstacle list) as its arguments. It computes vertices of a visibility polygon in CW order and returns them.
+
+**Preconditions:**
+- The line segments must not intersect except at their endpoints 
+- The visiblity polygon has to be closed. 
+
+**Behaviour of the library is undefined if the preconditions aren't met**. The first condition can be met by finding all intersection points of line segments and splitting them up. The second condition can be met by adding line segments of the bounding box of all obstacles. Note: checking these conditions is entirely up you. This library does not check them as that would introduce additional overhead.
 
 ### Vector
 
